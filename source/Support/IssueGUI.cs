@@ -17,6 +17,7 @@
 
 #region Using Directives
 
+using ExceptionDetector.Support;
 using KSP.Localization;
 using System;
 using System.Collections.Generic;
@@ -32,14 +33,14 @@ namespace ExceptionDetector
     {
         #region Fields
 
-        private GUIStyle buttonStyle;
+        private static GUIStyle buttonStyle;
         private bool hasPositioned;
         private List<string> message;
         private int msgCount = 20;
         private Rect position = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
         private string title;
-        private GUIStyle titleStyle;
-        private GUIStyle listStyle;
+        private static GUIStyle titleStyle;
+        private static GUIStyle listStyle;
         private bool initDone = false;
         private float lastFrameTime = 0.0f;
 
@@ -105,7 +106,8 @@ namespace ExceptionDetector
                     lastHeight = Screen.height;
                 }
                 if (!isVisible)
-                    this.position = GUILayout.Window(this.GetInstanceID(), this.position, this.Window, this.title, HighLogic.Skin.window);
+                    //this.position = GUILayout.Window(this.GetInstanceID(), this.position, this.Window, this.title, HighLogic.Skin.window);
+                    this.position = CBTWrapper.GUILayoutWindow(this.GetInstanceID(), this.position, this.Window, this.title, HighLogic.Skin);
                 this.PositionWindow();
 
                 //UpdateMessages();
@@ -204,7 +206,7 @@ namespace ExceptionDetector
         private void InitialiseStyles()
         {
             initDone = true;
-            this.titleStyle = new GUIStyle(HighLogic.Skin.label)
+            titleStyle = new GUIStyle(HighLogic.Skin.label)
             {
                 normal =
                      {
@@ -227,7 +229,7 @@ namespace ExceptionDetector
                 stretchWidth = true
             };
 
-            this.buttonStyle = new GUIStyle(HighLogic.Skin.button)
+            buttonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 normal =
                      {
@@ -243,37 +245,44 @@ namespace ExceptionDetector
             {
                 using (new GUILayout.VerticalScope())
                 {
-                    //GUILayout.BeginVertical(HighLogic.Skin.box);
                     using (new GUILayout.HorizontalScope())
                     {
-                        if (ExceptionDetector.WordWrap != GUILayout.Toggle(ExceptionDetector.WordWrap, " " + Localizer.Format("#EXCD-09")))
+                        using (new GUILayout.VerticalScope())
                         {
-                            ExceptionDetector.WordWrap = !ExceptionDetector.WordWrap;
-                            Config.Save();
+                            using (new GUILayout.HorizontalScope())
+                            {
+                                if (ExceptionDetector.WordWrap != GUILayout.Toggle(ExceptionDetector.WordWrap, " " + Localizer.Format("#EXCD-09")))
+                                {
+                                    ExceptionDetector.WordWrap = !ExceptionDetector.WordWrap;
+                                    Config.Save();
+                                }
+                                if (ExceptionDetector.FixedWidth != GUILayout.Toggle(ExceptionDetector.FixedWidth, " " + Localizer.Format("#EXCD-10")))
+                                {
+                                    ExceptionDetector.FixedWidth = !ExceptionDetector.FixedWidth;
+                                    Config.Save();
+                                }
+                                if (ExceptionDetector.UseWhitelist != GUILayout.Toggle(ExceptionDetector.UseWhitelist, " " + Localizer.Format("#EXCD-11")))
+                                {
+                                    ExceptionDetector.UseWhitelist = !ExceptionDetector.UseWhitelist;
+                                    Config.Save();
+                                }
+                            }
+                            //using (new GUILayout.HorizontalScope())
+                            {
+                                GUILayout.Label(Localizer.Format("#EXCD-05", msgCount), titleStyle, GUILayout.Width(Screen.width * 0.2f));
+                            }
+                            
+                            using (new GUILayout.HorizontalScope())
+                            {
+                                GUILayout.Label(Localizer.Format("#EXCD-06", Path.GetFullPath(ExceptionDetector.LogFile)), titleStyle); //, GUILayout.Width(position.width));
+                                GUILayout.FlexibleSpace();
+                            }
                         }
-                        if (ExceptionDetector.FixedWidth != GUILayout.Toggle(ExceptionDetector.FixedWidth, " " + Localizer.Format("#EXCD-10")))
+                        using (new GUILayout.VerticalScope())
                         {
-                            ExceptionDetector.FixedWidth = !ExceptionDetector.FixedWidth;
-                            Config.Save();
+                            GUILayout.Label(Localizer.Format("#EXCD-12"), titleStyle); // Resizable Window
+                            GUILayout.Label(Localizer.Format("#EXCD-13")); // drag the right edge, bottom edge, or bottom-right corner
                         }
-                        if (ExceptionDetector.UseWhitelist != GUILayout.Toggle(ExceptionDetector.UseWhitelist, " " + Localizer.Format("#EXCD-11")))
-                        {
-                            ExceptionDetector.UseWhitelist = !ExceptionDetector.UseWhitelist;
-                            Config.Save();
-                        }
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label("Resizable Window");
-                    }
-                    using (new GUILayout.HorizontalScope())
-                    {
-                        GUILayout.Label(Localizer.Format("#EXCD-05", msgCount), this.titleStyle, GUILayout.Width(Screen.width * 0.2f));
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label("drag the right edge, bottom edge, or bottom-right corner");
-                    }
-                    using (new GUILayout.HorizontalScope())
-                    {
-                        GUILayout.Label(Localizer.Format("#EXCD-06", Path.GetFullPath(ExceptionDetector.LogFile)), this.titleStyle); //, GUILayout.Width(position.width));
-                        GUILayout.FlexibleSpace();
                     }
                     if (doScrollView)
                         curPos = GUILayout.BeginScrollView(curPos, false, true);
@@ -284,28 +293,27 @@ namespace ExceptionDetector
                             listStyle.wordWrap = ExceptionDetector.WordWrap;
                             if (ExceptionDetector.WordWrap && ExceptionDetector.FixedWidth)
                             {
-                                GUILayout.Label(message[x], this.listStyle, GUILayout.Width(Screen.width * 0.2f - 30f));
+                                GUILayout.Label(message[x], listStyle, GUILayout.Width(Screen.width * 0.2f - 30f));
                                 //float a = x * listStyle.font.lineHeight;
                                 //Debug.Log("Window height: " + position.height + ", listStyle.font.lineHeight: " + listStyle.font.lineHeight
                                 //    + ", a:" + a);
                             }
                             else
-                                GUILayout.Label(message[x], this.listStyle);
+                                GUILayout.Label(message[x], listStyle);
                         }
                     }
                     if (doScrollView)
                         GUILayout.EndScrollView();
-                    //GUILayout.EndVertical();
                 }
                 GUILayout.FlexibleSpace();
                 using (new GUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(Localizer.Format("#autoLOC_149410"), this.buttonStyle))
+                    if (GUILayout.Button(Localizer.Format("#autoLOC_149410"), buttonStyle))
                     {
                         isActive = false;
                         Destroy(this);
                     }
-                    if (GUILayout.Button("Reset", this.buttonStyle))
+                    if (GUILayout.Button("Reset", buttonStyle))
                     {
                         ExceptionDetector.ResetLists();
                         Initmessage();

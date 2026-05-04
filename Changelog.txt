@@ -21,6 +21,7 @@ Changelog
     Added code to save the three toggle setting
     Added toggle to enable/disable the whitelist
     Added stock toolbar button to close and open window
+    Added optional support for ClickThroughBlocker.  If installed, it will be used
 
 TODO
     Document changes in README

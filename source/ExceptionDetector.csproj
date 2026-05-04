@@ -46,6 +46,13 @@
     <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <NoWarn>$(NoWarn);1570</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\Assembly*.dll">
       <Private>False</Private>
@@ -58,6 +65,7 @@
   <ItemGroup>
     <Compile Include="ExceptionDetector.cs" />
     <Compile Include="InstallChecker.cs" />
+    <Compile Include="Support\CBTWrapper.cs" />
     <Compile Include="Support\Config.cs" />
     <Compile Include="Support\IssueGUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -98,14 +106,4 @@ if $(ConfigurationName) == Release (
 )
 	</PostBuildEvent>
   </PropertyGroup>
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <TextStylePolicy TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" FileWidth="132" TabsToSpaces="False" scope="text/plain" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-    <VisualStudio AllowExistingFolder="true" />
-  </ProjectExtensions>
 </Project>
