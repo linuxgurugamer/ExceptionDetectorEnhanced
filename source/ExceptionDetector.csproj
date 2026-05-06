@@ -69,6 +69,7 @@
     <Compile Include="Support\Config.cs" />
     <Compile Include="Support\IssueGUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Support\ToolbarControllerWrapper.cs" />
     <Compile Include="ToolbarButton.cs" />
   </ItemGroup>
   <ItemGroup>

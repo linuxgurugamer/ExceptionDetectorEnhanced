@@ -37,7 +37,7 @@ namespace ExceptionDetector
         private bool hasPositioned;
         private List<string> message;
         private int msgCount = 20;
-        private Rect position = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
+        internal Rect position; // = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
         private string title;
         private static GUIStyle titleStyle;
         private static GUIStyle listStyle;
@@ -58,6 +58,7 @@ namespace ExceptionDetector
 
         protected void Initmessage()
         {
+            Config.Load();
             message = new List<string>();
             for (int x = 1; x <= msgCount; x++)
             {
@@ -67,9 +68,11 @@ namespace ExceptionDetector
 
         protected void Awake()
         {
+            Debug.Log("ExceptionDetector.IssueGUI.Awake: 1");
+
             try
             {
-                DontDestroyOnLoad(this);
+                //DontDestroyOnLoad(this);
                 Initmessage();
             }
             catch (Exception ex)
@@ -106,11 +109,8 @@ namespace ExceptionDetector
                     lastHeight = Screen.height;
                 }
                 if (!isVisible)
-                    //this.position = GUILayout.Window(this.GetInstanceID(), this.position, this.Window, this.title, HighLogic.Skin.window);
                     this.position = CBTWrapper.GUILayoutWindow(this.GetInstanceID(), this.position, this.Window, this.title, HighLogic.Skin);
-                this.PositionWindow();
-
-                //UpdateMessages();
+                //this.PositionWindow();
             }
             catch (Exception ex)
             {
@@ -122,13 +122,6 @@ namespace ExceptionDetector
         private void Update()
         {
 
-            //if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) &&
-            //	Input.GetKeyDown(KeyCode.F2))
-            //{
-            //	isVisible = !isVisible;
-            //}
-
-            //if (lastFrameTime < Time.time + (1 / 24f)) // 24fps
             if (lastFrameTime < Time.time + 1)
             {
                 lastFrameTime = Time.time;
@@ -159,6 +152,14 @@ namespace ExceptionDetector
 
                 GameEvents.onShowUI.Add(OnShowUI);
                 GameEvents.onHideUI.Add(OnHideUI);
+                this.position = ExceptionDetector.position;
+                if (position.width == 0 || position.height == 0)
+                {
+                    position.width = Screen.width * .5f;
+                    position.height = Screen.height * 0.25f;
+                    position.x = (Screen.width - position.width)/ 2;
+                    position.y = Screen.height * .1f; // (Screen.height - position.height)/ 2;
+                }
 
             }
             catch (Exception ex)
@@ -181,20 +182,9 @@ namespace ExceptionDetector
             isVisible = true;
         }
 
+#if false
         private void PositionWindow()
         {
-            // if (windowX + windowWidth >= Screen.currentResolution.width)
-            // {
-            //       windowX = Screen.currentResolution.width * 0.05;
-            //       windowWidth = Screen.currentResolution.width * 0.9;
-            // }
-
-            // if (windowY + windowHeight >= Screen.currentResolution.height)
-            // {
-            //       windowY = Screen.currentResolution.height * 0.05;
-            //       windowHeight = Screen.currentResolution.height * 0.9;
-            // }
-
             if (this.hasPositioned || !(this.position.width > 0) || !(this.position.height > 0))
             {
                 return;
@@ -202,6 +192,7 @@ namespace ExceptionDetector
             this.position.center = new Vector2(Screen.width * 0.75f, (Screen.height) / 2);
             this.hasPositioned = true;
         }
+#endif
 
         private void InitialiseStyles()
         {
@@ -238,6 +229,26 @@ namespace ExceptionDetector
             };
         }
 
+        string TruncateWithEllipsis(string text, GUIStyle style, float maxWidth)
+        {
+            if (style.CalcSize(new GUIContent(text)).x <= maxWidth)
+                return text;
+
+            string ellipsis = "...";
+            float ellipsisWidth = style.CalcSize(new GUIContent(ellipsis)).x;
+
+            for (int i = text.Length - 1; i > 0; i--)
+            {
+                string truncated = text.Substring(0, i);
+                float width = style.CalcSize(new GUIContent(truncated)).x;
+
+                if (width + ellipsisWidth <= maxWidth)
+                    return truncated + ellipsis;
+            }
+
+            return ellipsis;
+        }
+
         Vector2 curPos = new Vector2();
         private void Window(int id)
         {
@@ -256,22 +267,29 @@ namespace ExceptionDetector
                                     ExceptionDetector.WordWrap = !ExceptionDetector.WordWrap;
                                     Config.Save();
                                 }
+#if false
                                 if (ExceptionDetector.FixedWidth != GUILayout.Toggle(ExceptionDetector.FixedWidth, " " + Localizer.Format("#EXCD-10")))
                                 {
                                     ExceptionDetector.FixedWidth = !ExceptionDetector.FixedWidth;
                                     Config.Save();
                                 }
+#endif
+                                if (ExceptionDetector.Bold != GUILayout.Toggle(ExceptionDetector.Bold, " " + Localizer.Format("#EXCD-14")))
+                                {
+                                    ExceptionDetector.Bold = !ExceptionDetector.Bold;
+                                    Config.Save();
+                                }
+
+
+
                                 if (ExceptionDetector.UseWhitelist != GUILayout.Toggle(ExceptionDetector.UseWhitelist, " " + Localizer.Format("#EXCD-11")))
                                 {
                                     ExceptionDetector.UseWhitelist = !ExceptionDetector.UseWhitelist;
                                     Config.Save();
                                 }
                             }
-                            //using (new GUILayout.HorizontalScope())
-                            {
-                                GUILayout.Label(Localizer.Format("#EXCD-05", msgCount), titleStyle, GUILayout.Width(Screen.width * 0.2f));
-                            }
-                            
+                            GUILayout.Label(Localizer.Format("#EXCD-05", msgCount), titleStyle, GUILayout.Width(Screen.width * 0.2f));
+
                             using (new GUILayout.HorizontalScope())
                             {
                                 GUILayout.Label(Localizer.Format("#EXCD-06", Path.GetFullPath(ExceptionDetector.LogFile)), titleStyle); //, GUILayout.Width(position.width));
@@ -291,6 +309,9 @@ namespace ExceptionDetector
                         if (message[x].Length > 5)
                         {
                             listStyle.wordWrap = ExceptionDetector.WordWrap;
+                            listStyle.clipping = TextClipping.Clip;
+                            listStyle.fontStyle = ExceptionDetector.Bold ? FontStyle.Bold : FontStyle.Normal;
+#if false
                             if (ExceptionDetector.WordWrap && ExceptionDetector.FixedWidth)
                             {
                                 GUILayout.Label(message[x], listStyle, GUILayout.Width(Screen.width * 0.2f - 30f));
@@ -299,7 +320,13 @@ namespace ExceptionDetector
                                 //    + ", a:" + a);
                             }
                             else
-                                GUILayout.Label(message[x], listStyle);
+#endif
+                            {
+                                if (!ExceptionDetector.WordWrap)
+                                    GUILayout.Label(TruncateWithEllipsis(message[x], listStyle, position.width - 20), listStyle);
+                                else
+                                    GUILayout.Label(message[x], listStyle);
+                            }
                         }
                     }
                     if (doScrollView)
@@ -310,7 +337,11 @@ namespace ExceptionDetector
                 {
                     if (GUILayout.Button(Localizer.Format("#autoLOC_149410"), buttonStyle))
                     {
+                        Config.Save();
                         isActive = false;
+
+                        ToolbarButton.toolbarButton.OnFalse();
+                        ToolbarButton.toolbarButton.SetFalse();
                         Destroy(this);
                     }
                     if (GUILayout.Button("Reset", buttonStyle))

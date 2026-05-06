@@ -1,7 +1,7 @@
 Changelog  
 
 1.5.0
-    Linuxgurugamer Changes
+    Adoption by Linuxgurugamer
 
 	Merged in (by hand) ru files from github user @evanisrael
     Changed .Net version from .Net 3.5 to .Net 4.8
@@ -22,10 +22,13 @@ Changelog
     Added toggle to enable/disable the whitelist
     Added stock toolbar button to close and open window
     Added optional support for ClickThroughBlocker.  If installed, it will be used
+    Added optional support for ToolbarController.  If installed, it will be used
+    Added toggle to show exceptions either bold or normal
+    Removed toggle for fixed width
+    Added code to save window position
 
 TODO
     Document changes in README
-    Rename csproj file 
 
 | modName    | Exception Detector (EXCD) by godarklight                          |
 | ---------- | ----------------------------------------------------------------- |

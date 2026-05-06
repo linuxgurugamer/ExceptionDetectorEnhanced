@@ -1,33 +1,23 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using KSP.UI.Screens;
 using UnityEngine;
-using System.IO;
-using System.Text.RegularExpressions;  //Get Regex
-using KSP.UI.Screens;
-
-using System.Runtime.InteropServices;
-
-using static Targeting;
 
 namespace ExceptionDetector
 {
-
     [KSPAddon(KSPAddon.Startup.AllGameScenes, true)]
     public class ToolbarButton : MonoBehaviour
     {
+        internal const string MODID = "ED_NS";
+        internal const string MODNAME = "ExceptionDetector";
+        //static IssueGUI instance = null;
+        public static ToolbarButton toolbarButton = null;
+
         private static GameObject go;
-        private int windowId;
-        private bool showPopup;
-        private Rect popupPos;
-        private Func<int, object, bool> callback;
-        private object parameter;
 
         void Awake()
         {
             GameEvents.onGUIApplicationLauncherReady.Add(OnAppLauncherReady);
             DontDestroyOnLoad(this);
-
+            toolbarButton = this;
         }
 
         private static readonly string TestsPassingIconLocation = "ExceptionDetector/Icons/ed";
@@ -35,6 +25,7 @@ namespace ExceptionDetector
         private ApplicationLauncherButton button;
         private Texture TestsPassingIcon;
 
+        private ToolbarWrapper toolbar;
         private void OnAppLauncherReady()
         {
             TestsPassingIcon = GameDatabase.Instance.GetTexture(TestsPassingIconLocation, false);
@@ -44,42 +35,45 @@ namespace ExceptionDetector
                 ApplicationLauncher.Instance.RemoveModApplication(button);
                 button = null;
             }
-            button = ApplicationLauncher.Instance.AddModApplication(
+            toolbar = new ToolbarWrapper(
+                this,
                 OnTrue, OnFalse,
-                null,
-                null,
-                null,
-                null,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.SPACECENTER |
                 ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
-                TestsPassingIcon);
-
+                MODNAME,
+                MODID,
+                TestsPassingIconLocation,
+                TestsPassingIconLocation,
+                "Exception Detector"
+                );
         }
 
 
-
-        internal const string MODID = "ED_NS";
-        internal const string MODNAME = "ExceptionDetector";
-        static IssueGUI instance = null;
-
-        void OnTrue()
+        internal void OnTrue()
         {
             if (go == null)
             {
                 go = new GameObject("Any");
             }
-            if (!IssueGUI.isActive) 
-                instance = go.AddComponent<IssueGUI>();
+            if (!IssueGUI.isActive)
+            {
+                ExceptionDetector.fiGui = go.AddComponent<IssueGUI>();
+            }
         }
 
-        void OnFalse()
+        internal void OnFalse()
         {
-            if (instance != null)
+            if (ExceptionDetector.fiGui != null)
             {
-                Destroy(instance);
-                instance = null;
+                Destroy(ExceptionDetector.fiGui);
+                ExceptionDetector.fiGui = null;
                 IssueGUI.isActive = false;
             }
+        }
+
+        internal void SetFalse(bool value = false)
+        {
+            toolbar.SetFalse(value);
         }
 
     }

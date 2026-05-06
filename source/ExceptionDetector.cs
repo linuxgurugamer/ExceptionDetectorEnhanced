@@ -52,6 +52,7 @@ namespace ExceptionDetector
         //===Exception storage===
         //Key: Class name, Value: StackInfo
         private static Dictionary<string, StackInfo> classCache = new Dictionary<string, StackInfo>();
+       
         //Key: DLL name, Value: [Key: Class.Method name, Value: Number of throws]
         private static Dictionary<string, Dictionary<StackInfo, int>> methodThrows = new Dictionary<string, Dictionary<StackInfo, int>>();
         //Time of all the throws
@@ -59,8 +60,7 @@ namespace ExceptionDetector
         //===Display state===
         private float lastDisplayTime = float.NegativeInfinity;
         private string displayState;
-        private Rect windowRect = new Rect(10, 10, 400, 50);
-        private GUILayoutOption[] expandOptions = null;
+
         private static HashSet<string> kspDlls = new HashSet<string>();
         private static HashSet<string> unityDlls = new HashSet<string>();
         private HashSet<string> textureErrors = new HashSet<string>();
@@ -82,7 +82,9 @@ namespace ExceptionDetector
         internal static String SettingsFile { get; } = Path.Combine(_assemblyPath, "../PluginData/settings.cfg");
         internal static String LogFile { get; } = Path.Combine(directory + "ed.log");
 
-        private IssueGUI fiGui;
+        internal static IssueGUI fiGui;
+        internal static Rect position; //  = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
+
         public static ExceptionDetector Instance { get; private set; }
         internal static string strMessage = String.Empty;
         #endregion
@@ -93,7 +95,8 @@ namespace ExceptionDetector
         public static bool ShowInfoMessage { get; set; } = false;
 
         public static bool WordWrap { get; set; } = true;
-        public static bool FixedWidth { get; set; } = true;
+        //public static bool FixedWidth { get; set; } = true;
+        public static bool Bold { get; set; } = true;
         public static bool UseWhitelist { get; set; } = true;
 
 
