@@ -39,7 +39,7 @@ namespace ExceptionDetectorEnhanced
             windowRect = CBTWrapper.GUILayoutWindow(this.GetInstanceID(),
                 windowRect,
                 DrawWindow,
-                Localizer.Format(Localizer.Format("#autoLOC_14945")),
+                Localizer.Format("#autoLOC_149458"),
                 GUILayout.Width(300)
             );
         }
