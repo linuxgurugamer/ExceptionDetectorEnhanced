@@ -76,11 +76,48 @@ namespace ExceptionDetectorEnhanced
         static internal Dictionary<string, string> WhitelistValues = new Dictionary<string, string>();
         static internal Dictionary<string, string> AlwayslistValues = new Dictionary<string, string>();
 
-        private static readonly string _assemblyPath = Path.GetDirectoryName(typeof(ExceptionDetectorEnhanced).Assembly.Location);
+        private static bool _pathsInitialized;
+        private static string _assemblyPath;
+        private static string _directory;
 
-        private static readonly string directory = KSPUtil.ApplicationRootPath + "/Logs/ExceptionDetector/";
-        internal static String SettingsFile { get; } = Path.Combine(_assemblyPath, "../PluginData/settings.cfg");
-        internal static String LogFile { get; } = Path.Combine(directory + "ed.log");
+        private static void EnsurePathsInitialized()
+        {
+            if (_pathsInitialized)
+            {
+                return;
+            }
+
+            _assemblyPath = Path.GetDirectoryName(typeof(ExceptionDetectorEnhanced).Assembly.Location);
+            _directory = Path.Combine(KSPUtil.ApplicationRootPath, "Logs", "ExceptionDetector");
+            _pathsInitialized = true;
+        }
+
+        internal static string DirectoryPath
+        {
+            get
+            {
+                EnsurePathsInitialized();
+                return _directory;
+            }
+        }
+
+        internal static string SettingsFile
+        {
+            get
+            {
+                EnsurePathsInitialized();
+                return Path.GetFullPath(Path.Combine(_assemblyPath, "..", "PluginData", "settings.cfg"));
+            }
+        }
+
+        internal static string LogFile
+        {
+            get
+            {
+                EnsurePathsInitialized();
+                return Path.Combine(_directory, "ed.log");
+            }
+        }
 
         internal static IssueGUI fiGui;
         internal static Rect position; //  = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
@@ -117,8 +154,10 @@ namespace ExceptionDetectorEnhanced
         {
             Instance = this;
 
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+            EnsurePathsInitialized();
+
+            if (!Directory.Exists(_directory))
+                Directory.CreateDirectory(_directory);
 
             InitLog();
             Config.Load();
@@ -144,7 +183,7 @@ namespace ExceptionDetectorEnhanced
         {
             fiGui = gameObject.AddComponent<IssueGUI>();
 
-            DirectoryInfo source = new DirectoryInfo(directory);
+            DirectoryInfo source = new DirectoryInfo(DirectoryPath);
             foreach (FileInfo fi in source.GetFiles())
             {
                 var creationTime = fi.CreationTime;
@@ -389,6 +428,7 @@ namespace ExceptionDetectorEnhanced
             }
             else
             {
+                EnsurePathsInitialized();
                 string pathToGameData = Path.GetFullPath(Path.Combine(_assemblyPath, ".." + Path.DirectorySeparatorChar + ".. " + Path.DirectorySeparatorChar));
                 retVal = condition.Replace(pathToGameData, String.Empty).Replace("GameData", String.Empty);
             }
@@ -497,6 +537,7 @@ namespace ExceptionDetectorEnhanced
         {
             if (!String.IsNullOrEmpty(strMessage))
             {
+                EnsurePathsInitialized();
                 FileStream objFilestream = new FileStream(ExceptionDetectorEnhanced.LogFile, FileMode.Append, FileAccess.Write);
                 StreamWriter objStreamWriter = new StreamWriter((Stream)objFilestream);
                 objStreamWriter.AutoFlush = true;
@@ -508,6 +549,7 @@ namespace ExceptionDetectorEnhanced
 
         private static void InitLog()
         {
+            EnsurePathsInitialized();
             FileStream objFilestream = new FileStream(ExceptionDetectorEnhanced.LogFile, FileMode.Create, FileAccess.Write);
             StreamWriter objStreamWriter = new StreamWriter((Stream)objFilestream);
             objStreamWriter.AutoFlush = true;
