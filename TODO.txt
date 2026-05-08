@@ -1,0 +1,8 @@
+TODO
+
+	Clicking on a line to show the actual log - hard
+
+	Clicking on a line to add to whitelist - medium
+
+
+

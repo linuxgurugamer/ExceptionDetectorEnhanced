@@ -20,6 +20,11 @@ namespace ExceptionDetectorEnhanced
             DontDestroyOnLoad(this);
             toolbarButton = this;
         }
+        void OnDestroy()
+        {
+            GameEvents.onGUIApplicationLauncherReady.Remove(OnAppLauncherReady);
+            GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
+        }
 
         void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> data)
         {

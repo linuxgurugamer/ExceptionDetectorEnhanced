@@ -66,6 +66,7 @@
     <Compile Include="DictionaryEditorWindow.cs" />
     <Compile Include="ExceptionDetectorEnhanced.cs" />
     <Compile Include="InstallChecker.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Support\CBTWrapper.cs" />
     <Compile Include="Support\Config.cs" />
     <Compile Include="Support\IssueGUI.cs" />

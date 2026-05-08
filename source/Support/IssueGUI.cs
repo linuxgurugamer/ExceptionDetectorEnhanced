@@ -37,7 +37,7 @@ namespace ExceptionDetectorEnhanced
         private static GUIStyle buttonStyle;
         GUIStyle rightLabel;
         private bool hasPositioned;
-        private List<string> message;
+        private List<string> message, logLine;
         private int msgCount = 20;
         internal Rect position; // = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
         private string title;
@@ -62,9 +62,11 @@ namespace ExceptionDetectorEnhanced
         {
             Config.Load();
             message = new List<string>();
+            logLine = new List<string>();
             for (int x = 1; x <= msgCount; x++)
             {
                 message.Add(String.Format("{0}: ", x));
+                logLine.Add(String.Format("{0}: ", x));
             }
         }
 
@@ -85,6 +87,8 @@ namespace ExceptionDetectorEnhanced
         protected void OnDestroy()
         {
             //Logger.Log("FirstRunGui was destroyed.");
+            GameEvents.onShowUI.Remove(OnShowUI);
+            GameEvents.onHideUI.Remove(OnHideUI);
         }
 
         float lastHeight = 0;
@@ -136,10 +140,13 @@ namespace ExceptionDetectorEnhanced
             if (ExceptionDetectorEnhanced.ExceptionCount.Count() > 2)
             {
                 var list = ExceptionDetectorEnhanced.ExceptionCount.ToList();
+                logLine = Enumerable.Repeat("", msgCount).ToList();
                 list.Sort((x, y) => y.Value.CompareTo(x.Value));
                 for (int x = 0; x < msgCount; x++)
                 {
                     message[x] = x >= list.Count() ? String.Format("{0}", x + 1) : String.Format("{0}:  {1} times : {2}", x + 1, list[x].Value, list[x].Key);
+
+                    logLine[x] = x >= list.Count() ? String.Format("{0}", x + 1) : String.Format("{0}", list[x].Key);
                 }
             }
         }
@@ -261,51 +268,17 @@ namespace ExceptionDetectorEnhanced
                 {
                     using (new GUILayout.HorizontalScope())
                     {
-                        var ww = GUILayout.Toggle(ExceptionDetectorEnhanced.WordWrap, togglespace);
-                        GUILayout.Label(" " + Localizer.Format("#EXCD-09"), GUILayout.MinWidth(90));
-                        if (ExceptionDetectorEnhanced.WordWrap != ww)
-                        {
-                            ExceptionDetectorEnhanced.WordWrap = !ExceptionDetectorEnhanced.WordWrap;
-                            Config.Save();
-                        }
-
-                        var b = GUILayout.Toggle(ExceptionDetectorEnhanced.Bold, togglespace);
-                        GUILayout.Label(" " + Localizer.Format("#EXCD-14"), GUILayout.MinWidth(60));
-                        if (ExceptionDetectorEnhanced.Bold != b)
-                        {
-                            ExceptionDetectorEnhanced.Bold = !ExceptionDetectorEnhanced.Bold;
-                            Config.Save();
-                        }
-
-
-                        var uwl = GUILayout.Toggle(ExceptionDetectorEnhanced.UseWhitelist, togglespace);
-                        GUILayout.Label(" " + Localizer.Format("#EXCD-11"), GUILayout.MinWidth(120));
-                        if (ExceptionDetectorEnhanced.UseWhitelist != uwl)
-                        {
-                            ExceptionDetectorEnhanced.UseWhitelist = !ExceptionDetectorEnhanced.UseWhitelist;
-                            Config.Save();
-                        }
-
-                        var ual = GUILayout.Toggle(ExceptionDetectorEnhanced.UseAlwayslist, togglespace);
-                        GUILayout.Label(" " + Localizer.Format("#EXCD-15"), GUILayout.MinWidth(120));
-                        if (ExceptionDetectorEnhanced.UseAlwayslist != ual)
-                        {
-                            ExceptionDetectorEnhanced.UseAlwayslist = !ExceptionDetectorEnhanced.UseAlwayslist;
-                            Config.Save();
-                        }
                         if (GUILayout.Button(" " + Localizer.Format("#EXCD-20") + " "))
                         {
-
-                            var go = new GameObject("Any");
-                            dew = go.AddComponent<DictionaryEditorWindow>();
+                            dew = gameObject.AddComponent<DictionaryEditorWindow>();
                         }
 
-                        bool uas = ExceptionDetectorEnhanced.UseAltSkin;
-                        ExceptionDetectorEnhanced.UseAltSkin = GUILayout.Toggle(ExceptionDetectorEnhanced.UseAltSkin, togglespace);
-                        GUILayout.Label(" " + Localizer.Format("#EXCD-21"), GUILayout.MinWidth(90));
-                        if (uas != ExceptionDetectorEnhanced.UseAltSkin)
-                            InitRightLabel();
-
+                        if (GUILayout.Button(" " + Localizer.Format("#autoLOC_149458") + " "))
+                        {
+                            gameObject.AddComponent<SettingsWindow>();
+                        }
+                        GUILayout.FlexibleSpace();
+                        GUILayout.Label("Click on a line to copy to clipboard", titleStyle);
                         GUILayout.FlexibleSpace();
                         GUILayout.Label(Localizer.Format("#EXCD-12"), titleStyle, GUILayout.MinWidth(120)); // Resizable Window
                     }
@@ -330,12 +303,20 @@ namespace ExceptionDetectorEnhanced
                             listStyle.wordWrap = ExceptionDetectorEnhanced.WordWrap;
                             listStyle.clipping = TextClipping.Clip;
                             listStyle.fontStyle = ExceptionDetectorEnhanced.Bold ? FontStyle.Bold : FontStyle.Normal;
+                            bool rc = false;
+                            if (!ExceptionDetectorEnhanced.WordWrap)
+                                rc = GUILayout.Button(TruncateWithEllipsis(message[x], listStyle, position.width - 20), listStyle);
+                            else
+                                rc = GUILayout.Button(message[x], listStyle);
+                            if (rc)
                             {
-                                if (!ExceptionDetectorEnhanced.WordWrap)
-                                    GUILayout.Label(TruncateWithEllipsis(message[x], listStyle, position.width - 20), listStyle);
-                                else
-                                    GUILayout.Label(message[x], listStyle);
+                                Debug.Log("ExceptionDetector, button pressed");
+
+                                if (logLine[x].StartsWith(Localizer.Format("#EXCD-abbv")))
+                                    logLine[x] = logLine[x].Substring(Localizer.Format("#EXCD-abbv").Length).TrimStart();
+                                GUIUtility.systemCopyBuffer = logLine[x];
                             }
+
                         }
                     }
                     if (doScrollView)

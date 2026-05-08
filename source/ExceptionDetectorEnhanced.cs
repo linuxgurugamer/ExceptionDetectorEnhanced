@@ -95,12 +95,11 @@ namespace ExceptionDetectorEnhanced
         public static bool ShowInfoMessage { get; set; } = false;
 
         public static bool WordWrap { get; set; } = true;
-        //public static bool FixedWidth { get; set; } = true;
         public static bool Bold { get; set; } = true;
         public static bool UseWhitelist { get; set; } = true;
         public static bool UseAlwayslist { get; set; } = true;
         public static bool UseAltSkin { get; set; } = true;
-
+        internal static bool ShowAtStartup { get; set; } = true;
 
         #endregion
 
@@ -142,7 +141,8 @@ namespace ExceptionDetectorEnhanced
 
         protected void Start()
         {
-            fiGui = gameObject.AddComponent<IssueGUI>();
+            if (ExceptionDetectorEnhanced.ShowAtStartup)
+                fiGui = gameObject.AddComponent<IssueGUI>();
 
             DirectoryInfo source = new DirectoryInfo(directory);
             foreach (FileInfo fi in source.GetFiles())
@@ -182,11 +182,6 @@ namespace ExceptionDetectorEnhanced
                 {
                     UpdateDisplayString();
                 }
-                //if (displayState != null)
-                //{
-                //Random number
-                //windowRect = GUILayout.Window(1660952404, windowRect, DrawMethod, "Exception Detector", expandOptions);
-                //}
             }
             catch (Exception ex)
             {

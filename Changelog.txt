@@ -1,5 +1,12 @@
 Changelog  
 
+1.5.1
+    Added Settings page
+    Moved toggles to settings page
+    Added missing removal of GameEvents upon destruction
+    Added new option to Show At Startup or not
+    Added click on line to copy to clipboard
+
 1.5.0
     Adoption by Linuxgurugamer
 
@@ -18,14 +25,13 @@ Changelog
     Added code to not write the stacktrace to the log file if it was empty
     Added whitelist (if string is in the error condition, it won't be reported)
     Added resizing to the window, using the right edge, bottom right corner or bottom edge
-    Added toggles to top of window to enable/disable word wrapping and fixed width; fixed width only applies when wordwrap is enabled, it keeps the text width to about 20% of the screen width
+    Added toggles to top of window to enable/disable word wrapping
     Added code to save the toggle settings
     Added stock toolbar button to close and open window
     Added optional support for ClickThroughBlocker.  If installed, it will be used
     Added optional support for ToolbarController.  If installed, it will be used
     Added toggle to show exceptions either bold or normal
     Added code to save window position
-
     Added an Alwayslist, to always show specific strings
     Added an edit window for the alwayslist and whitelist
     Added toggle to use alternate skin

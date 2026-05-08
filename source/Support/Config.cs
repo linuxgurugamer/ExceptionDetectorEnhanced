@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace ExceptionDetectorEnhanced
@@ -18,6 +19,7 @@ namespace ExceptionDetectorEnhanced
         private static string _usewhitelist = "UseWhitelist";
         private static string _usealwayslist = "UseAlwayslist";
         private static string _usealtskin = "UseAltSkin";
+        private static string _showatstartup = "ShowAtStartup";
 
         private static string _bold = "Bold";
 
@@ -80,10 +82,7 @@ namespace ExceptionDetectorEnhanced
                     if (float.TryParse(y, out var Y)) ExceptionDetectorEnhanced.position.y = Y;
                     if (float.TryParse(width, out var Width)) ExceptionDetectorEnhanced.position.width = Width;
                     if (float.TryParse(height, out var Height)) ExceptionDetectorEnhanced.position.height = Height;
-#if false
-					var fixedwidth = settings.GetValue(_fixedwidth);
-                    if (bool.TryParse(fixedwidth, out var fw)) ExceptionDetectorEnhanced.Bold = fw;
-#endif
+
                     var bold = settings.GetValue(_bold);
                     if (bool.TryParse(bold, out var fw)) ExceptionDetectorEnhanced.Bold = fw;
 
@@ -95,6 +94,9 @@ namespace ExceptionDetectorEnhanced
 
                     var useAltSkin = settings.GetValue(_usealtskin);
                     if (bool.TryParse(useAltSkin, out var uas)) ExceptionDetectorEnhanced.UseAltSkin = uas;
+
+                    var showAtStartup = settings.GetValue(_showatstartup);
+                    if (bool.TryParse(showAtStartup, out var sas)) ExceptionDetectorEnhanced.ShowAtStartup = sas;
 
                 }
                 Save();
@@ -146,6 +148,7 @@ namespace ExceptionDetectorEnhanced
                 settings.AddValue(_usewhitelist, ExceptionDetectorEnhanced.UseWhitelist);
                 settings.AddValue(_usealwayslist, ExceptionDetectorEnhanced.UseAlwayslist);
                 settings.AddValue(_usealtskin, ExceptionDetectorEnhanced.UseAltSkin);
+                settings.AddValue(_showatstartup, ExceptionDetectorEnhanced.ShowAtStartup);
 
                 settings.AddValue(_x, ExceptionDetectorEnhanced.fiGui.position.x);
                 settings.AddValue(_y, ExceptionDetectorEnhanced.fiGui.position.y);
