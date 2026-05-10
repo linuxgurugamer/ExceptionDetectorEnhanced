@@ -310,8 +310,6 @@ namespace ExceptionDetectorEnhanced
                                 rc = GUILayout.Button(message[x], listStyle);
                             if (rc)
                             {
-                                Debug.Log("ExceptionDetector, button pressed");
-
                                 if (logLine[x].StartsWith(Localizer.Format("#EXCD-abbv")))
                                     logLine[x] = logLine[x].Substring(Localizer.Format("#EXCD-abbv").Length).TrimStart();
                                 GUIUtility.systemCopyBuffer = logLine[x];

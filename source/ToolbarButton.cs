@@ -38,7 +38,6 @@ namespace ExceptionDetectorEnhanced
         private ToolbarWrapper toolbar;
         private void OnAppLauncherReady()
         {
-            Debug.Log("ExceptionDetector OnAppLauncherReady 1");
             TestsPassingIcon = GameDatabase.Instance.GetTexture(TestsPassingIconLocation, false);
 
             //if (button != null)
@@ -48,7 +47,6 @@ namespace ExceptionDetectorEnhanced
             //}
             if (toolbar == null || ToolbarWrapper.toolbarControllerAvailable == false)
             {
-                Debug.Log("ExceptionDetector OnAppLauncherReady 2");
                 toolbar = new ToolbarWrapper(
                     this,
                     OnTrue, OnFalse,

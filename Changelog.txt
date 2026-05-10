@@ -1,5 +1,9 @@
 Changelog  
 
+1.5.1.2 
+    Fixed AssemblyVersion.tt to use correct version file
+    Removed some debugging lines
+
 1.5.1.1
     Added checks in Save and logging module to prevent NullReferences if any of the lists are empty
 
