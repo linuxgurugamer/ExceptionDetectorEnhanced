@@ -4,6 +4,7 @@ using static GameEvents;
 
 namespace ExceptionDetectorEnhanced
 {
+
     [KSPAddon(KSPAddon.Startup.AllGameScenes, true)]
     public class ToolbarButton : MonoBehaviour
     {
@@ -19,6 +20,7 @@ namespace ExceptionDetectorEnhanced
             GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
             DontDestroyOnLoad(this);
             toolbarButton = this;
+
         }
         void OnDestroy()
         {

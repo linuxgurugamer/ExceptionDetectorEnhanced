@@ -76,11 +76,13 @@ namespace ExceptionDetectorEnhanced
         static internal Dictionary<string, string> WhitelistValues = new Dictionary<string, string>();
         static internal Dictionary<string, string> AlwayslistValues = new Dictionary<string, string>();
 
-        private static readonly string _assemblyPath = Path.GetDirectoryName(typeof(ExceptionDetectorEnhanced).Assembly.Location);
 
-        private static readonly string directory = KSPUtil.ApplicationRootPath + "/Logs/ExceptionDetector/";
-        internal static String SettingsFile { get; } = Path.Combine(_assemblyPath, "../PluginData/settings.cfg");
-        internal static String LogFile { get; } = Path.Combine(directory + "ed.log");
+        private static string _assemblyPath; //  = Path.GetDirectoryName(typeof(ExceptionDetectorEnhanced).Assembly.Location);
+
+        private static string DirectoryPath; // = KSPUtil.ApplicationRootPath + "/Logs/ExceptionDetector/";
+
+        internal static String SettingsFile;
+        internal static String LogFile;
 
         internal static IssueGUI fiGui;
         internal static Rect position; //  = new Rect(Screen.width * .8f, Screen.height * .1f, Screen.width * .5f, Screen.height * 0.25f);
@@ -103,6 +105,15 @@ namespace ExceptionDetectorEnhanced
 
         #endregion
 
+        internal static void InitPaths()
+        {
+            _assemblyPath = Path.GetDirectoryName(typeof(ExceptionDetectorEnhanced).Assembly.Location);
+            DirectoryPath = KSPUtil.ApplicationRootPath + "/Logs/ExceptionDetector/";
+            SettingsFile = Path.Combine(_assemblyPath, "../PluginData/settings.cfg");
+            LogFile = Path.Combine(DirectoryPath + "ed.log");
+        }
+
+
         internal static void ResetLists()
         {
             SinglePassValues = new Dictionary<string, string>();
@@ -112,12 +123,16 @@ namespace ExceptionDetectorEnhanced
         }
 
         #region events
+
+
         public void Awake()
         {
+            InitPaths();
+
             Instance = this;
 
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+            if (!Directory.Exists(DirectoryPath))
+                Directory.CreateDirectory(DirectoryPath);
 
             InitLog();
             Config.Load();
@@ -144,7 +159,7 @@ namespace ExceptionDetectorEnhanced
             if (ExceptionDetectorEnhanced.ShowAtStartup)
                 fiGui = gameObject.AddComponent<IssueGUI>();
 
-            DirectoryInfo source = new DirectoryInfo(directory);
+            DirectoryInfo source = new DirectoryInfo(DirectoryPath);
             foreach (FileInfo fi in source.GetFiles())
             {
                 var creationTime = fi.CreationTime;
